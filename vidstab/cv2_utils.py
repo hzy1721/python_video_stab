@@ -24,11 +24,14 @@ def safe_import_cv2():
 # noinspection PyPep8Naming
 def cv2_estimateRigidTransform(from_pts, to_pts, full=False):
     """Estimate transforms in OpenCV 3 or OpenCV 4"""
+    # from_pts和to_pts有一个为空：直接返回
     if not from_pts.shape[0] or not to_pts.shape[0]:
         return None
 
+    # OpenCV 4
     if imutils.is_cv4():
         transform = cv2.estimateAffinePartial2D(from_pts, to_pts)[0]
+    # 其他版本
     else:
         # noinspection PyUnresolvedReferences
         transform = cv2.estimateRigidTransform(from_pts, to_pts, full)

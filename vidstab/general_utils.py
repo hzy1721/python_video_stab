@@ -17,13 +17,18 @@ def bfill_rolling_mean(arr, n=30):
     array([[2.5, 3.5, 4.5],
            [2.5, 3.5, 4.5]])
     """
+    # 原始变换帧数不能小于平滑窗口大小
     if arr.shape[0] < n:
         raise ValueError('arr.shape[0] cannot be less than n')
+    # 平滑窗口为1的话直接返回
     if n == 1:
         return arr
 
+    # (1,3)
     pre_buffer = np.zeros(3).reshape(1, 3)
+    # (n,3)
     post_buffer = np.zeros(3 * n).reshape(n, 3)
+    # (1+shape[0]+n,3)
     arr_cumsum = np.cumsum(np.vstack((pre_buffer, arr, post_buffer)), axis=0)
     buffer_roll_mean = (arr_cumsum[n:, :] - arr_cumsum[:-n, :]) / float(n)
     trunc_roll_mean = buffer_roll_mean[:-n, ]
@@ -46,27 +51,36 @@ def init_progress_bar(frame_count, max_frames, show_progress=True, gen_all=False
     >>> progress_bar = init_progress_bar(30, float('inf'))
     >>> # Stabilizing |█████████████████████████▋      | 80%
     """
+    # 不显示进度条
     if not show_progress:
         return None
 
     # frame count is negative during some cv2.CAP_PROP_FRAME_COUNT failures
+    # 获取视频帧数失败
     bad_frame_count = frame_count <= 0
+    # 没有总帧数或者总帧数>max_frames
     use_max_frames = bad_frame_count or frame_count > max_frames
 
+    # 没有总帧数，max_frames是inf：无法显示
     if bad_frame_count and max_frames == float('inf'):
         warnings.warn('No progress bar will be shown. (Unable to grab frame count & no max_frames provided.)')
         return None
 
+    # 最大进度：max_frames或frame_count
     max_bar = max_frames if use_max_frames else frame_count
+    # 进度条提示信息
     message = progress_message(gen_all)
 
+    # IncrementalBar实例
     return IncrementalBar(message, max=max_bar, suffix='%(percent)d%%')
 
 
 def progress_message(gen_all):
     """Decide progress bar message based on gen_all flag"""
+    # 生成变换
     if gen_all:
         return 'Generating Transforms'
+    # 去抖动
     else:
         return 'Stabilizing'
 
@@ -79,18 +93,23 @@ def update_progress_bar(bar, show_progress=True, finish=False):
     :param finish: finish progress bar
     :return: updated progress bar
     """
+    # 需要显示进度条并且bar实例不为空
     if show_progress and bar is not None:
+        # 进度+1
         bar.next()
 
+        # 显示完成
         if finish:
             bar.finish()
 
 
 def playback_video(display_frame, playback_flag, delay, max_display_width=750):
+    # 不实时演示：直接返回
     if not playback_flag:
         return False
 
     if display_frame.shape[1] > max_display_width:
+        # 缩放
         display_frame = imutils.resize(display_frame, width=max_display_width)
 
     cv2.imshow('VidStab Playback ({} frame delay if using live video;'

@@ -16,9 +16,13 @@ def functional_border_sizes(border_size):
     >>> functional_border_sizes(-10)
     (100, 110)
     """
+    # 用户提供的边框宽度是负数
     if border_size < 0:
+        # neg_border_size等于100加上负数的绝对值
         neg_border_size = 100 + abs(border_size)
+        # border_size为100
         border_size = 100
+    # 是非负数
     else:
         neg_border_size = 0
 

@@ -20,11 +20,14 @@ def plot_trajectory(transforms, trajectory, smoothed_trajectory):
     >>> stabilizer.plot_trajectory()
     >>> plt.show()
     """
+    # transforms不能为空
     if transforms is None:
         raise AttributeError('No trajectory to plot. '
                              'Use methods: gen_transforms or stabilize to generate the trajectory attributes')
 
+    # ggplot风格
     with plt.style.context('ggplot'):
+        # 创建2个子图，共享x轴
         fig, (ax1, ax2) = plt.subplots(2, sharex='all')
 
         # x trajectory
@@ -37,12 +40,16 @@ def plot_trajectory(transforms, trajectory, smoothed_trajectory):
         ax2.plot(smoothed_trajectory[:, 1], label='Smoothed Trajectory')
         ax2.set_ylabel('dy')
 
+        #
         handles, labels = ax2.get_legend_handles_labels()
         fig.legend(handles, labels, loc='upper right')
 
+        # x轴标签
         plt.xlabel('Frame Number')
 
+        #
         fig.suptitle('Video Trajectory', x=0.15, y=0.96, ha='left')
+        # 窗口标题
         fig.canvas.set_window_title('Trajectory')
 
         return fig, (ax1, ax2)
@@ -65,20 +72,26 @@ def plot_transforms(transforms, radians=False):
     >>> stabilizer.plot_transforms()
     >>> plt.show()
     """
+    # transforms不能为空
     if transforms is None:
         raise AttributeError('No transforms to plot. '
                              'Use methods: gen_transforms or stabilize to generate the transforms attribute')
 
+    # ggplot风格
     with plt.style.context('ggplot'):
+        # 创建2个子图，共享x轴标签
         fig, (ax1, ax2) = plt.subplots(2, sharex='all')
 
+        #
         ax1.plot(transforms[:, 0], label='delta x', color='C0')
         ax1.plot(transforms[:, 1], label='delta y', color='C1')
         ax1.set_ylabel('Delta Pixels', fontsize=10)
 
+        # 弧度
         if radians:
             ax2.plot(transforms[:, 2], label='delta angle', color='C2')
             ax2.set_ylabel('Delta Radians', fontsize=10)
+        # 角度
         else:
             ax2.plot(np.rad2deg(transforms[:, 2]), label='delta angle', color='C2')
             ax2.set_ylabel('Delta Degrees', fontsize=10)
@@ -90,9 +103,12 @@ def plot_transforms(transforms, radians=False):
                    loc='upper right',
                    ncol=1)
 
+        # x轴标签
         plt.xlabel('Frame Number')
 
+        #
         fig.suptitle('Transformations for Stabilizing', x=0.15, y=0.96, ha='left')
+        # 窗口标题
         fig.canvas.set_window_title('Transforms')
 
         return fig, (ax1, ax2)
